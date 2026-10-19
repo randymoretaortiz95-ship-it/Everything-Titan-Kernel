@@ -1,0 +1,226 @@
+[
+  {
+    "numero": 1,
+    "titolo": "Stato completo di un corpo",
+    "stato": "Noto",
+    "formula": "S(t) = (p, v, q, ω)",
+    "nota": "In 3D l’orientazione richiede il quaternione q, non un solo angolo. È una riduzione del sistema: va dichiarato cosa si modella.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 2,
+    "titolo": "Resistenza aerodinamica",
+    "stato": "Modello",
+    "formula": "F = −½·ρ·A·Cd(θ,δ)·‖v_rel‖·v_rel",
+    "nota": "Cd va definita con dati. Con Eulero esplicito il decadimento resta monotono se Δt < 2m/(ρ·A·Cd·‖v‖); oltre il doppio diverge.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 3,
+    "titolo": "Portanza da rotazione (Magnus)",
+    "stato": "Modello",
+    "formula": "CL = CL_max·tanh(k·S), S = ω·R/v",
+    "nota": "La saturazione è empirica: CL_max e k vanno tarati su misure. La forza è diretta lungo ω × v.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 4,
+    "titolo": "Integrazione RK4",
+    "stato": "Noto",
+    "formula": "Errore globale O(Δt⁴)",
+    "nota": "Non conserva l’energia (lieve dissipazione). Per simulazioni conservative lunghe si usano integratori simplettici.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 5,
+    "titolo": "Efficienza organizzativa",
+    "stato": "Da validare",
+    "formula": "η = 1/(1 + ρ·μ·∫c dt)",
+    "nota": "Analogia con variabili operative misurabili (ore perse, passaggi autorizzativi). I parametri vanno stimati su dati reali.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 6,
+    "titolo": "Accumulo di torsione",
+    "stato": "Corretto",
+    "formula": "τ(t) = (μ/γ)·(e^{γt} − 1)",
+    "nota": "Finito per ogni t finito. Tempo critico: t = (1/γ)·ln(1 + γ·τ_max/μ), oppure dτ/dt = kτ², che esplode a 1/(k·τ₀).",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 7,
+    "titolo": "Memoria della scia",
+    "stato": "Da validare",
+    "formula": "dW/dt = −γ·W + d(t)",
+    "nota": "È un filtro passa-basso causale del disturbo. Il vantaggio rispetto agli osservatori standard va testato in simulazione.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 8,
+    "titolo": "Indice di stabilità globale",
+    "stato": "Corretto",
+    "formula": "E = Σ wᵢ·ηᵢ/(1 + δSᵢ/S₀)",
+    "nota": "Limitato e senza divergenze; variante prudente: il minimo tra i sottosistemi. La stabilità si dimostra con funzioni di Lyapunov.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 9,
+    "titolo": "Resistenza vascolare",
+    "stato": "Noto",
+    "formula": "R = 8ηL/(π·r⁴)",
+    "nota": "Vale per flusso laminare newtoniano in tubo rigido. Il sangue è non newtoniano: non è uno strumento diagnostico.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 10,
+    "titolo": "Carico del debito",
+    "stato": "Noto",
+    "formula": "d₀ ≤ pb·(1+g)/(r−g), per r > g",
+    "nota": "Il rapporto servizio/reddito da solo non certifica l’insolvenza: contano crescita, avanzo primario e rifinanziamento.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 11,
+    "titolo": "Soglia igrometrica",
+    "stato": "Modello",
+    "formula": "R = R₀/(|UR − UR_crit| + ε)",
+    "nota": "UR_crit = 43% vale per un sistema specifico. Servono ε e un’isteresi per evitare commutazioni continue.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 12,
+    "titolo": "Riduzione della vorticità",
+    "stato": "Corretto",
+    "formula": "ℰ = ½·∫|ω|² dV",
+    "nota": "Irrotazionale non significa laminare: il flusso di Poiseuille ha rotore non nullo. Si controlla Reynolds o l’enstrofia.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 13,
+    "titolo": "Vibrazioni a fase anticipata",
+    "stato": "Modello",
+    "formula": "u = u₀·sin(2πf·(t + τ_a))",
+    "nota": "f e ritardo τ_a vanno identificati. Una frequenza fissa cancella solo disturbi a banda stretta.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 14,
+    "titolo": "Rendimento di apprendimento",
+    "stato": "Corretto",
+    "formula": "E = I_d/(I_d + I_g)",
+    "nota": "Il limite discende dalla definizione. Il valore sta nel misurare I_d e I_g nella stessa unità.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 15,
+    "titolo": "Hashing spaziale",
+    "stato": "Noto",
+    "formula": "Hash = (⌊x/s⌋·p₁ ⊕ ⌊y/s⌋·p₂ ⊕ ⌊z/s⌋·p₃) mod M",
+    "nota": "Interrogazione O(1) in media; coppie vicine O(N) in media e O(N²) nel caso peggiore.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 16,
+    "titolo": "Controllo locale",
+    "stato": "Noto",
+    "formula": "Ciclo critico sul nodo periferico",
+    "nota": "È un obiettivo di progetto: scadenze real-time e dati remoti trattati come ritardati.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 17,
+    "titolo": "Terreno procedurale",
+    "stato": "Noto",
+    "formula": "H = ⌊δ·Σ aₖ·|N(x/λₖ, z/λₖ)|⌋",
+    "nota": "Memoria O(1) per il terreno base, non tempo di calcolo. Le modifiche dell’utente vanno salvate.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 18,
+    "titolo": "Instancing su GPU",
+    "stato": "Noto",
+    "formula": "Vᵢⱼ = Mᵢ·vⱼ",
+    "nota": "Memoria O(P + K), non O(P): le K matrici vanno comunque caricate.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 19,
+    "titolo": "Sintesi a fase continua",
+    "stato": "Corretto",
+    "formula": "φₙ₊₁ = φₙ + 2π·fₙ/f_s",
+    "nota": "La continuità di fase è garantita. Restano il rumore di quantizzazione e l’aliasing oltre Nyquist.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 20,
+    "titolo": "Estrazione del segnale",
+    "stato": "Corretto",
+    "formula": "SNR = P_segnale/P_rumore",
+    "nota": "Il rumore è stocastico: si stima (filtro adattato, Wiener), non si sottrae. In cosmologia l’energia non si conserva globalmente.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 21,
+    "titolo": "Carico cognitivo e pause",
+    "stato": "Da validare",
+    "formula": "dS/dt = μ·ρ(t) − S/τ_r",
+    "nota": "Con recupero spontaneo e S ≥ 0. I parametri vanno stimati da dati.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 22,
+    "titolo": "Controllo e flessibilità",
+    "stato": "Da validare",
+    "formula": "Esiste un ottimo interno μ*",
+    "nota": "Troppo controllo è alto bias, non over-fitting. Il compromesso bias–varianza va verificato.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 23,
+    "titolo": "Adattamento d’impedenza",
+    "stato": "Corretto",
+    "formula": "Z_L = Z_S* (R_L = R_S)",
+    "nota": "Massima potenza con rendimento 50%. Il massimo rendimento richiede perdite → 0 e R_L ≫ R_S.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 24,
+    "titolo": "Quantità di moto residua",
+    "stato": "Noto",
+    "formula": "u = −k·p, con k = 2ζ·√(kp/m)",
+    "nota": "Equivale a una retroazione in velocità (kd = k·m). Verificata in simulazione, non ancora con rumore o ritardo.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 25,
+    "titolo": "Viscosità con soglia igrometrica",
+    "stato": "Modello",
+    "formula": "μ = μ₀·[1 + α·H(UR−UR_s)·(UR−UR_s)²]",
+    "nota": "Continua e derivabile alla soglia: cambia solo la curvatura. α e UR_s vanno misurati.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 26,
+    "titolo": "Mappatura con una sonda",
+    "stato": "Modello",
+    "formula": "F_campo = m·a − F_nota",
+    "nota": "È la seconda legge di Newton. Una sonda campiona solo il proprio percorso e derivare due volte amplifica il rumore.",
+    "verificato_numericamente": true
+  },
+  {
+    "numero": 27,
+    "titolo": "Guardrail fisico per AI",
+    "stato": "Da validare",
+    "formula": "se ‖bilancio‖ > ε, rigetto",
+    "nota": "Verifica a tempo di esecuzione con ε legato all’incertezza e un comportamento sicuro di riserva. Condizione necessaria, non sufficiente.",
+    "verificato_numericamente": false
+  },
+  {
+    "numero": 28,
+    "titolo": "Sviluppo iterativo di un sistema",
+    "stato": "Corretto",
+    "formula": "K(S_N) ≤ K(S₀) + K(Φ) + K(N)",
+    "nota": "L’iterazione deterministica non crea informazione algoritmica: cresce la complessità apparente, non quella di Kolmogorov.",
+    "verificato_numericamente": true
+  }
+]
