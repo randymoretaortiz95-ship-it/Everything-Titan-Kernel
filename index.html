@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Titan Research Labs: Verificatore Fisico / Physics Verifier / Verificador Físico</title>
+<style>
+:root{--bg:#f4f7fb;--cd:#ffffff;--in:#eef2f7;--tx:#0f172a;--mu:#475569;--ac:#0f766e;--gd:#b45309;--bd:#cbd5e1;--bad:#b91c1c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1329;--cd:#121d38;--in:#050a15;--tx:#f8fafc;--mu:#94a3b8;--ac:#2dd4bf;--gd:#f59e0b;--bd:rgba(45,212,191,.3);--bad:#f87171}}
+:root[data-theme="dark"]{--bg:#0b1329;--cd:#121d38;--in:#050a15;--tx:#f8fafc;--mu:#94a3b8;--ac:#2dd4bf;--gd:#f59e0b;--bd:rgba(45,212,191,.3);--bad:#f87171}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 "Segoe UI",system-ui,sans-serif}
+header,main,footer{max-width:860px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-top:28px}
+h1{margin:0;font-size:1.7rem;letter-spacing:-.5px;color:var(--ac)}
+h2{margin:0 0 4px;font-size:1.1rem;border-bottom:2px solid var(--ac);display:inline-block;padding-bottom:2px}
+.sub{font-size:1.05rem;margin:0 0 6px}
+.help,.note,footer{color:var(--mu);font-size:.9rem;margin:4px 0 8px}
+.card{background:var(--cd);border:1px solid var(--bd);border-left:4px solid var(--ac);border-radius:8px;padding:18px;margin:18px 0}
+textarea,input{width:100%;box-sizing:border-box;background:var(--in);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:8px;font:14px "Courier New",monospace}
+textarea:focus,input:focus,button:focus-visible{outline:2px solid var(--gd);outline-offset:1px}
+label span{display:block;font-size:.85rem;color:var(--mu);margin:8px 0 4px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.cols{grid-template-columns:1fr}}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+button{cursor:pointer;border-radius:6px;padding:8px 16px;border:1px solid var(--ac);background:var(--ac);color:var(--bg);font:600 .95rem "Segoe UI",system-ui,sans-serif}
+button.ghost,.lang button{background:transparent;color:var(--ac)}
+.lang button{padding:5px 12px}
+.lang button[aria-pressed="true"]{background:var(--ac);color:var(--bg)}
+.res{white-space:pre-wrap;border-left:4px solid var(--bd);padding:8px 12px;margin-top:10px;font:14px "Courier New",monospace}
+.res:empty{display:none}
+.res.ok{border-color:var(--ac)}
+.res.bad{border-color:var(--bad)}
+</style>
+</head>
+<body>
+<header>
+  <h1 data-i="h1"></h1>
+  <div class="lang" role="group" aria-label="Language">
+    <button data-l="it">IT</button> <button data-l="en">EN</button> <button data-l="es">ES</button>
+  </div>
+</header>
+<main>
+  <p class="sub" data-i="sub"></p>
+  <p class="note" data-i="note"></p>
+
+  <section class="card">
+    <h2 data-i="d_t"></h2>
+    <p class="help" data-i="d_h"></p>
+    <textarea id="din" rows="5" spellcheck="false"></textarea>
+    <div class="row">
+      <button id="rd" data-i="run"></button>
+      <button class="ghost" id="e1" data-i="ex1"></button>
+      <button class="ghost" id="e2" data-i="ex2"></button>
+    </div>
+    <div id="do" class="res" role="status"></div>
+  </section>
+
+  <section class="card">
+    <h2 data-i="b_t"></h2>
+    <p class="help" data-i="b_h"></p>
+    <div class="cols">
+      <label><span data-i="b_in"></span><textarea id="bin" rows="4" spellcheck="false"></textarea></label>
+      <label><span data-i="b_out"></span><textarea id="bout" rows="4" spellcheck="false"></textarea></label>
+      <label><span data-i="b_acc"></span><input id="bacc" type="text" inputmode="decimal" value="0"></label>
+      <label><span data-i="b_tol"></span><input id="btol" type="text" inputmode="decimal" value="2"></label>
+    </div>
+    <div class="row"><button id="rb" data-i="run"></button></div>
+    <div id="bo" class="res" role="status"></div>
+  </section>
+
+  <section class="card">
+    <h2 data-i="p_t"></h2>
+    <p class="help" data-i="p_h"></p>
+    <textarea id="pin" rows="5" spellcheck="false"></textarea>
+    <div class="row"><button id="rp" data-i="run"></button></div>
+    <div id="po" class="res" role="status"></div>
+  </section>
+</main>
+<footer data-i="foot"></footer>
+
+<script>
+const T={
+it:{h1:"Verificatore Fisico",sub:"Controlli gratuiti, nel browser, su coerenza dimensionale, bilanci di conservazione e plausibilità fisica. Nulla lascia il tuo dispositivo.",note:"È un controllo di buon senso, non una dimostrazione: superarlo non rende corretto un risultato.",
+d_t:"Coerenza dimensionale",d_h:"Scrivi un’equazione (con =) e una riga per ogni variabile, nella forma nome: unità.",run:"Verifica",ex1:"Esempio corretto",ex2:"Esempio errato",
+b_t:"Bilancio di conservazione",b_h:"Una riga per voce, nella forma etichetta, valore. Tutte le voci nella stessa unità.",b_in:"Ingressi",b_out:"Uscite",b_acc:"Accumulo",b_tol:"Tolleranza ε (%)",
+p_t:"Plausibilità fisica",p_h:"Una riga per controllo, nella forma tipo valore. Tipi: efficiency (%), tempC, tempK, probability, nonneg.",
+ok:"Coerente",bad:"Incoerente",lhs:"Primo membro",rhs:"Secondo membro",res:"Residuo",rel:"Residuo relativo",rej:"Risultato rifiutato. Non usare questo valore finché l’incoerenza non è risolta.",
+unk:"Simbolo sconosciuto",add:"Somma di grandezze incompatibili",dl:"L’argomento della funzione deve essere adimensionale",syn:"Errore di sintassi",noeq:"Manca l’equazione (una riga con =)",
+rng:"fuori intervallo",unkk:"tipo o valore non riconosciuto",foot:"Limiti: verifica la forma, non la verità. I modelli di Titan Research Labs sono verificati in simulazione, non ancora sperimentalmente."},
+en:{h1:"Physics Verifier",sub:"Free, in-browser checks for dimensional consistency, conservation balances and physical plausibility. Nothing leaves your device.",note:"This is a sanity check, not a proof: passing it does not make a result correct.",
+d_t:"Dimensional consistency",d_h:"Write one equation (with =) and one line per variable, as name: unit.",run:"Check",ex1:"Valid example",ex2:"Faulty example",
+b_t:"Conservation balance",b_h:"One line per item, as label, value. All items in the same unit.",b_in:"Inputs",b_out:"Outputs",b_acc:"Accumulation",b_tol:"Tolerance ε (%)",
+p_t:"Physical plausibility",p_h:"One line per check, as kind value. Kinds: efficiency (%), tempC, tempK, probability, nonneg.",
+ok:"Consistent",bad:"Inconsistent",lhs:"Left side",rhs:"Right side",res:"Residual",rel:"Relative residual",rej:"Result rejected. Do not use this value until the inconsistency is resolved.",
+unk:"Unknown symbol",add:"Sum of incompatible quantities",dl:"A function argument must be dimensionless",syn:"Syntax error",noeq:"Equation missing (one line with =)",
+rng:"out of range",unkk:"unrecognised kind or value",foot:"Limits: this checks form, not truth. Titan Research Labs models are verified in simulation, not yet experimentally."},
+es:{h1:"Verificador Físico",sub:"Comprobaciones gratuitas, en el navegador, de coherencia dimensional, balances de conservación y plausibilidad física. Nada sale de tu dispositivo.",note:"Es una comprobación de sentido común, no una demostración: superarla no hace correcto un resultado.",
+d_t:"Coherencia dimensional",d_h:"Escribe una ecuación (con =) y una línea por variable, con la forma nombre: unidad.",run:"Verificar",ex1:"Ejemplo correcto",ex2:"Ejemplo erróneo",
+b_t:"Balance de conservación",b_h:"Una línea por elemento, con la forma etiqueta, valor. Todos en la misma unidad.",b_in:"Entradas",b_out:"Salidas",b_acc:"Acumulación",b_tol:"Tolerancia ε (%)",
+p_t:"Plausibilidad física",p_h:"Una línea por comprobación, con la forma tipo valor. Tipos: efficiency (%), tempC, tempK, probability, nonneg.",
+ok:"Coherente",bad:"Incoherente",lhs:"Primer miembro",rhs:"Segundo miembro",res:"Residuo",rel:"Residuo relativo",rej:"Resultado rechazado. No uses este valor hasta resolver la incoherencia.",
+unk:"Símbolo desconocido",add:"Suma de magnitudes incompatibles",dl:"El argumento de una función debe ser adimensional",syn:"Error de sintaxis",noeq:"Falta la ecuación (una línea con =)",
+rng:"fuera de rango",unkk:"tipo o valor no reconocido",foot:"Límites: comprueba la forma, no la verdad. Los modelos de Titan Research Labs están verificados en simulación, aún no experimentalmente."}
+};
+const $=id=>document.getElementById(id);
+let L="it";
+const NM=["m","kg","s","A","K","mol","cd"];
+const UN={m:[1,0,0,0,0,0,0],kg:[0,1,0,0,0,0,0],g:[0,1,0,0,0,0,0],s:[0,0,1,0,0,0,0],A:[0,0,0,1,0,0,0],K:[0,0,0,0,1,0,0],mol:[0,0,0,0,0,1,0],cd:[0,0,0,0,0,0,1],
+N:[1,1,-2,0,0,0,0],J:[2,1,-2,0,0,0,0],W:[2,1,-3,0,0,0,0],Wh:[2,1,-2,0,0,0,0],Pa:[-1,1,-2,0,0,0,0],bar:[-1,1,-2,0,0,0,0],Hz:[0,0,-1,0,0,0,0],
+V:[2,1,-3,-1,0,0,0],C:[0,0,1,1,0,0,0],L:[3,0,0,0,0,0,0],h:[0,0,1,0,0,0,0],min:[0,0,1,0,0,0,0]};
+const unit=x=>{if(UN[x])return UN[x];if("GMkhcmuµnp".includes(x[0])&&UN[x.slice(1)])return UN[x.slice(1)];throw{k:"unk",n:x}};
+const sup=n=>String(n).replace(/[-.0-9]/g,c=>({"-":"⁻",".":"·"}[c]||"⁰¹²³⁴⁵⁶⁷⁸⁹"[c]));
+const fmt=d=>d.map((x,j)=>x?NM[j]+(x===1?"":sup(+x.toFixed(3))):"").filter(Boolean).join("·")||"1";
+
+function parse(s,res){
+  const t=s.match(/[A-Za-zµΩ_][\wµΩ]*|\d+(?:\.\d+)?|[-+*/^()]/g)||[];let i=0;
+  const Z=[0,0,0,0,0,0,0],add=(a,b,k)=>a.map((x,j)=>x+k*b[j]),same=(a,b)=>a.every((x,j)=>x===b[j]),fail=k=>{throw{k}};
+  function E(){let a=M();while(t[i]==="+"||t[i]==="-"){i++;const b=M();if(!same(a,b))throw{k:"add",a,b}}return a}
+  function M(){let a=P();while(t[i]==="*"||t[i]==="/"){const o=t[i++],b=P();a=add(a,b,o==="*"?1:-1)}return a}
+  function P(){let a=F();if(t[i]==="^"){i++;let g=1;if(t[i]==="-"||t[i]==="+")g=t[i++]==="-"?-1:1;const n=parseFloat(t[i++]);if(isNaN(n))fail("syn");a=a.map(x=>x*n*g)}return a}
+  function F(){const x=t[i++];if(x===undefined)fail("syn");
+    if(x==="("){const a=E();if(t[i++]!==")")fail("syn");return a}
+    if(x==="-"||x==="+")return F();
+    if(/^\d/.test(x))return Z;
+    if(t[i]==="("&&/^(sqrt|sin|cos|tan|exp|ln|log)$/.test(x)){const a=F();if(x==="sqrt")return a.map(v=>v/2);if(!a.every(v=>v===0))fail("dl");return Z}
+    return res(x)}
+  const r=E();if(i<t.length)fail("syn");return r}
+
+const show=(el,ok,txt)=>{el.className="res "+(ok?"ok":"bad");el.textContent=txt};
+const lines=id=>$(id).value.split(/\n/).map(s=>s.trim()).filter(Boolean);
+const num=x=>+(+x).toFixed(6);
+
+function runD(){const t=T[L];
+  try{const v={};let q=null;
+    for(const l of lines("din")){if(l.includes(":")){const k=l.indexOf(":");v[l.slice(0,k).trim()]=parse(l.slice(k+1),unit)}else q=l}
+    if(!q)throw{k:"noeq"};
+    const p=q.split("=");if(p.length!==2)throw{k:"syn"};
+    const rv=x=>{if(!(x in v))throw{k:"unk",n:x};return v[x]};
+    const a=parse(p[0],rv),b=parse(p[1],rv),ok=a.every((x,j)=>x===b[j]);
+    show($("do"),ok,(ok?"✓ "+t.ok:"✗ "+t.bad)+"\n"+t.lhs+": "+fmt(a)+"\n"+t.rhs+": "+fmt(b)+(ok?"":"\n"+t.rej));
+  }catch(e){if(!e||!e.k)e={k:"syn"};
+    show($("do"),false,"✗ "+(e.k==="unk"?t.unk+": "+e.n:e.k==="add"?t.add+": "+fmt(e.a)+" ≠ "+fmt(e.b):t[e.k]||t.syn))}}
+
+const sum=id=>lines(id).reduce((a,l)=>{const m=l.match(/(-?\d+(?:[.,]\d+)?)\s*$/);return m?a+parseFloat(m[1].replace(",",".")):a},0);
+function runB(){const t=T[L],i=sum("bin"),o=sum("bout"),a=parseFloat($("bacc").value.replace(",","."))||0,tol=parseFloat($("btol").value.replace(",","."))||0;
+  const r=i-o-a,d=Math.max(Math.abs(i),Math.abs(o),1e-12),rel=Math.abs(r)/d*100,ok=rel<=tol;
+  show($("bo"),ok,(ok?"✓ "+t.ok:"✗ "+t.bad)+"\n"+t.b_in+": "+num(i)+", "+t.b_out+": "+num(o)+", "+t.b_acc+": "+num(a)+"\n"+t.res+": "+num(r)+", "+t.rel+": "+rel.toFixed(2)+"% (ε = "+tol+"%)"+(ok?"":"\n"+t.rej))}
+
+const RULES={efficiency:[0,100],tempC:[-273.15,Infinity],tempK:[0,Infinity],probability:[0,1],nonneg:[0,Infinity]};
+function runP(){const t=T[L];let bad=0;
+  const out=lines("pin").map(l=>{const [k,v]=l.split(/\s+/),r=RULES[k],x=parseFloat((v||"").replace(",","."));
+    if(!r||isNaN(x)){bad++;return "✗ "+l+" — "+t.unkk}
+    if(x<r[0]||x>r[1]){bad++;return "✗ "+l+" — "+t.rng+" ["+r[0]+", "+(r[1]===Infinity?"∞":r[1])+"]"}
+    return "✓ "+l});
+  show($("po"),!bad,out.join("\n")+(bad?"\n"+t.rej:""))}
+
+function setLang(l){L=l;document.documentElement.lang=l;
+  document.querySelectorAll("[data-i]").forEach(e=>e.textContent=T[l][e.dataset.i]);
+  document.querySelectorAll("[data-l]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===l));
+  ["do","bo","po"].forEach(id=>{$(id).className="res";$(id).textContent=""});
+  try{localStorage.setItem("vf_lang",l)}catch(e){}}
+
+const EX1="F = m*a\nF: N\nm: kg\na: m/s^2",EX2="E = m*v\nE: J\nm: kg\nv: m/s";
+$("din").value=EX1;
+$("bin").value="feed, 100\nrecycle, 20";$("bout").value="product, 95\nwaste, 24";
+$("pin").value="efficiency 112\ntempC -300\nprobability 0.4\nnonneg 5";
+$("e1").onclick=()=>{$("din").value=EX1;runD()};$("e2").onclick=()=>{$("din").value=EX2;runD()};
+$("rd").onclick=runD;$("rb").onclick=runB;$("rp").onclick=runP;
+document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+let l0="";try{l0=localStorage.getItem("vf_lang")||""}catch(e){}
+if(!T[l0])l0=T[(navigator.language||"en").slice(0,2)]?(navigator.language||"en").slice(0,2):"en";
+setLang(l0);
+</script>
+</body>
+</html>
