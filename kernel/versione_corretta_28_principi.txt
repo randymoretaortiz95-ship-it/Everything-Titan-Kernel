@@ -1,0 +1,116 @@
+TITAN RESEARCH LABS
+IL KERNEL: 28 PRINCIPI DI PROGETTO (REVISIONE TECNICA, OTTOBRE 2026)
+Stati: Noto = risultato standard; Modello = relazione empirica da tarare; Corretto = enunciato originale rettificato; Da validare = ipotesi non ancora verificata.
+Nessuna voce è stata validata con dati sperimentali. Le voci contrassegnate [verificato numericamente] sono state controllate con benchmarks/verifica_numerica_kernel.py.
+
+PRINCIPIO 1: Stato completo di un corpo [Stato: Noto]
+Formula: S(t) = (p, v, q, ω)
+Nota: In 3D l’orientazione richiede il quaternione q, non un solo angolo. È una riduzione del sistema: va dichiarato cosa si modella.
+
+PRINCIPIO 2: Resistenza aerodinamica [Stato: Modello] [verificato numericamente]
+Formula: F = −½·ρ·A·Cd(θ,δ)·‖v_rel‖·v_rel
+Nota: Cd va definita con dati. Con Eulero esplicito il decadimento resta monotono se Δt < 2m/(ρ·A·Cd·‖v‖); oltre il doppio diverge.
+
+PRINCIPIO 3: Portanza da rotazione (Magnus) [Stato: Modello]
+Formula: CL = CL_max·tanh(k·S), S = ω·R/v
+Nota: La saturazione è empirica: CL_max e k vanno tarati su misure. La forza è diretta lungo ω × v.
+
+PRINCIPIO 4: Integrazione RK4 [Stato: Noto] [verificato numericamente]
+Formula: Errore globale O(Δt⁴)
+Nota: Non conserva l’energia (lieve dissipazione). Per simulazioni conservative lunghe si usano integratori simplettici.
+
+PRINCIPIO 5: Efficienza organizzativa [Stato: Da validare]
+Formula: η = 1/(1 + ρ·μ·∫c dt)
+Nota: Analogia con variabili operative misurabili (ore perse, passaggi autorizzativi). I parametri vanno stimati su dati reali.
+
+PRINCIPIO 6: Accumulo di torsione [Stato: Corretto] [verificato numericamente]
+Formula: τ(t) = (μ/γ)·(e^{γt} − 1)
+Nota: Finito per ogni t finito. Tempo critico: t = (1/γ)·ln(1 + γ·τ_max/μ), oppure dτ/dt = kτ², che esplode a 1/(k·τ₀).
+
+PRINCIPIO 7: Memoria della scia [Stato: Da validare] [verificato numericamente]
+Formula: dW/dt = −γ·W + d(t)
+Nota: È un filtro passa-basso causale del disturbo. Il vantaggio rispetto agli osservatori standard va testato in simulazione.
+
+PRINCIPIO 8: Indice di stabilità globale [Stato: Corretto]
+Formula: E = Σ wᵢ·ηᵢ/(1 + δSᵢ/S₀)
+Nota: Limitato e senza divergenze; variante prudente: il minimo tra i sottosistemi. La stabilità si dimostra con funzioni di Lyapunov.
+
+PRINCIPIO 9: Resistenza vascolare [Stato: Noto] [verificato numericamente]
+Formula: R = 8ηL/(π·r⁴)
+Nota: Vale per flusso laminare newtoniano in tubo rigido. Il sangue è non newtoniano: non è uno strumento diagnostico.
+
+PRINCIPIO 10: Carico del debito [Stato: Noto] [verificato numericamente]
+Formula: d₀ ≤ pb·(1+g)/(r−g), per r > g
+Nota: Il rapporto servizio/reddito da solo non certifica l’insolvenza: contano crescita, avanzo primario e rifinanziamento.
+
+PRINCIPIO 11: Soglia igrometrica [Stato: Modello]
+Formula: R = R₀/(|UR − UR_crit| + ε)
+Nota: UR_crit = 43% vale per un sistema specifico. Servono ε e un’isteresi per evitare commutazioni continue.
+
+PRINCIPIO 12: Riduzione della vorticità [Stato: Corretto] [verificato numericamente]
+Formula: ℰ = ½·∫|ω|² dV
+Nota: Irrotazionale non significa laminare: il flusso di Poiseuille ha rotore non nullo. Si controlla Reynolds o l’enstrofia.
+
+PRINCIPIO 13: Vibrazioni a fase anticipata [Stato: Modello]
+Formula: u = u₀·sin(2πf·(t + τ_a))
+Nota: f e ritardo τ_a vanno identificati. Una frequenza fissa cancella solo disturbi a banda stretta.
+
+PRINCIPIO 14: Rendimento di apprendimento [Stato: Corretto]
+Formula: E = I_d/(I_d + I_g)
+Nota: Il limite discende dalla definizione. Il valore sta nel misurare I_d e I_g nella stessa unità.
+
+PRINCIPIO 15: Hashing spaziale [Stato: Noto] [verificato numericamente]
+Formula: Hash = (⌊x/s⌋·p₁ ⊕ ⌊y/s⌋·p₂ ⊕ ⌊z/s⌋·p₃) mod M
+Nota: Interrogazione O(1) in media; coppie vicine O(N) in media e O(N²) nel caso peggiore.
+
+PRINCIPIO 16: Controllo locale [Stato: Noto]
+Formula: Ciclo critico sul nodo periferico
+Nota: È un obiettivo di progetto: scadenze real-time e dati remoti trattati come ritardati.
+
+PRINCIPIO 17: Terreno procedurale [Stato: Noto]
+Formula: H = ⌊δ·Σ aₖ·|N(x/λₖ, z/λₖ)|⌋
+Nota: Memoria O(1) per il terreno base, non tempo di calcolo. Le modifiche dell’utente vanno salvate.
+
+PRINCIPIO 18: Instancing su GPU [Stato: Noto]
+Formula: Vᵢⱼ = Mᵢ·vⱼ
+Nota: Memoria O(P + K), non O(P): le K matrici vanno comunque caricate.
+
+PRINCIPIO 19: Sintesi a fase continua [Stato: Corretto] [verificato numericamente]
+Formula: φₙ₊₁ = φₙ + 2π·fₙ/f_s
+Nota: La continuità di fase è garantita. Restano il rumore di quantizzazione e l’aliasing oltre Nyquist.
+
+PRINCIPIO 20: Estrazione del segnale [Stato: Corretto]
+Formula: SNR = P_segnale/P_rumore
+Nota: Il rumore è stocastico: si stima (filtro adattato, Wiener), non si sottrae. In cosmologia l’energia non si conserva globalmente.
+
+PRINCIPIO 21: Carico cognitivo e pause [Stato: Da validare]
+Formula: dS/dt = μ·ρ(t) − S/τ_r
+Nota: Con recupero spontaneo e S ≥ 0. I parametri vanno stimati da dati.
+
+PRINCIPIO 22: Controllo e flessibilità [Stato: Da validare] [verificato numericamente]
+Formula: Esiste un ottimo interno μ*
+Nota: Troppo controllo è alto bias, non over-fitting. Il compromesso bias–varianza va verificato.
+
+PRINCIPIO 23: Adattamento d’impedenza [Stato: Corretto] [verificato numericamente]
+Formula: Z_L = Z_S* (R_L = R_S)
+Nota: Massima potenza con rendimento 50%. Il massimo rendimento richiede perdite → 0 e R_L ≫ R_S.
+
+PRINCIPIO 24: Quantità di moto residua [Stato: Noto] [verificato numericamente]
+Formula: u = −k·p, con k = 2ζ·√(kp/m)
+Nota: Equivale a una retroazione in velocità (kd = k·m). Verificata in simulazione, non ancora con rumore o ritardo.
+
+PRINCIPIO 25: Viscosità con soglia igrometrica [Stato: Modello] [verificato numericamente]
+Formula: μ = μ₀·[1 + α·H(UR−UR_s)·(UR−UR_s)²]
+Nota: Continua e derivabile alla soglia: cambia solo la curvatura. α e UR_s vanno misurati.
+
+PRINCIPIO 26: Mappatura con una sonda [Stato: Modello] [verificato numericamente]
+Formula: F_campo = m·a − F_nota
+Nota: È la seconda legge di Newton. Una sonda campiona solo il proprio percorso e derivare due volte amplifica il rumore.
+
+PRINCIPIO 27: Guardrail fisico per AI [Stato: Da validare]
+Formula: se ‖bilancio‖ > ε, rigetto
+Nota: Verifica a tempo di esecuzione con ε legato all’incertezza e un comportamento sicuro di riserva. Condizione necessaria, non sufficiente.
+
+PRINCIPIO 28: Sviluppo iterativo di un sistema [Stato: Corretto] [verificato numericamente]
+Formula: K(S_N) ≤ K(S₀) + K(Φ) + K(N)
+Nota: L’iterazione deterministica non crea informazione algoritmica: cresce la complessità apparente, non quella di Kolmogorov.
